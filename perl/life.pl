@@ -79,7 +79,6 @@ sub wnext {
 			my $count = 0;
 			for (my $i = $ys; $i <= $ye; $i++) {
 				for (my $j = $xs; $j <= $xe; $j++) {
-					# print "$ys, $ye , $xs, $xe :".$world->[$i][$j]."\n" if ($x == 0 && $y == 0);
 					$count++ if $world->[$i][$j] == 1;
 				}
 			}
