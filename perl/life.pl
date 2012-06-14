@@ -65,10 +65,9 @@ sub next {
 					$count++ if $self->{world}->[$i][$j] eq $self->{live};
 				}
 			}
-			$next_world->[$y][$x] = ($count == 2) ? $self->{dead}
-							 : ($count == 3) ? $self->{live}
-							 : ($count == 4) ? $self->{world}->[$y][$x]
-							 : $self->{dead};
+			$next_world->[$y][$x] = ($count == 3) ? $self->{live}
+				: ($count == 4) ? $self->{world}->[$y][$x]
+				: $self->{dead};
 		}
 	}
 	$self->{world} = $next_world;
