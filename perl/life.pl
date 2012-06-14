@@ -3,53 +3,75 @@
 use strict;
 use warnings;
 
-my $world;
-for (my $y = 0; <STDIN>; $y++) {
-	my @a = split(/\s/);
-	$world->[$y] = \@a;
-}
-
-my $height = @$world;
-my $width = $height;
-
-sub drow {
-	my $buff = '';
-	for (my $y = 0; $y < $height; $y++) {
-		for (my $x = 0; $x < $width; $x++) {
-			$buff .= $world->[$y][$x] == 1 ? "■ " : "□ ";
-		}
-		$buff .= "\n";
-	}
-	print "\33c"; # flash
-	print $buff;
-};
-
-sub wnext {
-	my $next_world;
-	for (my $y = 0; $y < $height; $y++) {
-		for (my $x = 0; $x < $width; $x++) {
-			my $xs = $x == 0 ? 0 : ($x - 1);
-			my $xe = $x == ($width - 1) ? ($width - 1) : ($x + 1);
-			my $ys = $y == 0 ? 0 : ($y - 1);
-			my $ye = $y == ($height - 1) ? ($height - 1) : ($y + 1);
-			my $count = 0;
-			for (my $i = $ys; $i <= $ye; $i++) {
-				for (my $j = $xs; $j <= $xe; $j++) {
-					$count++ if $world->[$i][$j] == 1;
-				}
-			}
-			$next_world->[$y][$x] = ($count == 2) ? 0
-							 : ($count == 3) ? 1
-							 : ($count == 4) ? $world->[$y][$x]
-							 : 0;
-		}
-	}
-	$world = $next_world;
-};
+my $life = GAME::OF::LIFE->new(
+	live => 1,
+	dead => 0
+);
 
 while (1) {
-	drow();
-	wnext();
+	print "\33c"; # flash
+	$life->drow();
+	$life->next();
 	select(undef, undef, undef, 0.1);
 }
 
+package GAME::OF::LIFE;
+
+sub new {
+	my ($class, %opts) = @_;
+	my $live = defined $opts{live} ? $opts{live} : '■';
+	my $dead = defined $opts{dead} ? $opts{dead} : '□';
+	my $world;
+	my $y;
+	for ($y = 0; <STDIN>; $y++) {
+		my @a = map {
+			($_ eq 1) ? $live : $dead;
+		} split(/\s/);
+		$world->[$y] = \@a;
+	}
+
+	bless {
+		world => $world,
+		size => $y,
+		live => $live,
+		dead => $dead,
+	}, $class;
+}
+
+sub drow {
+	my ($self) = @_;
+	my $buff = '';
+	for (my $y = 0; $y < $self->{size}; $y++) {
+		for (my $x = 0; $x < $self->{size}; $x++) {
+			$buff .= $self->{world}->[$y][$x] . " ";
+		}
+		$buff .= "\n";
+	}
+	print $buff;
+}
+
+sub next {
+	my ($self) = @_;
+	my $next_world;
+	for (my $y = 0; $y < $self->{size}; $y++) {
+		for (my $x = 0; $x < $self->{size}; $x++) {
+			my $xs = $x == 0 ? 0 : ($x - 1);
+			my $xe = $x == ($self->{size} - 1) ? ($self->{size} - 1) : ($x + 1);
+			my $ys = $y == 0 ? 0 : ($y - 1);
+			my $ye = $y == ($self->{size} - 1) ? ($self->{size} - 1) : ($y + 1);
+			my $count = 0;
+			for (my $i = $ys; $i <= $ye; $i++) {
+				for (my $j = $xs; $j <= $xe; $j++) {
+					$count++ if $self->{world}->[$i][$j] eq $self->{live};
+				}
+			}
+			$next_world->[$y][$x] = ($count == 2) ? $self->{dead}
+							 : ($count == 3) ? $self->{live}
+							 : ($count == 4) ? $self->{world}->[$y][$x]
+							 : $self->{dead};
+		}
+	}
+	$self->{world} = $next_world;
+};
+
+1;
