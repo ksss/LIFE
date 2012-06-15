@@ -3,10 +3,7 @@
 use strict;
 use warnings;
 
-my $life = GAME::OF::LIFE->new(
-	live => 1,
-	dead => 0
-);
+my $life = GAME::OF::LIFE->new();
 
 while (1) {
 	print "\33c"; # flash
@@ -22,32 +19,24 @@ sub new {
 	my $live = defined $opts{live} ? $opts{live} : '■';
 	my $dead = defined $opts{dead} ? $opts{dead} : '□';
 	my $world;
-	my $y;
-	for ($y = 0; <STDIN>; $y++) {
-		my @a = map {
-			($_ eq 1) ? $live : $dead;
-		} split(/\s/);
-		$world->[$y] = \@a;
+	my $size;
+	for ($size = 0; <STDIN>; $size++) {
+		$world->[$size] = [map { ($_ eq 1) ? $live : $dead } split(/\s/)];
 	}
 
 	bless {
+		live  => $live,
+		dead  => $dead,
 		world => $world,
-		size => $y,
-		live => $live,
-		dead => $dead,
+		size  => $size,
 	}, $class;
 }
 
 sub drow {
 	my ($self) = @_;
-	my $buff = '';
 	for (my $y = 0; $y < $self->{size}; $y++) {
-		for (my $x = 0; $x < $self->{size}; $x++) {
-			$buff .= $self->{world}->[$y][$x] . " ";
-		}
-		$buff .= "\n";
+		print join(' ', @{$self->{world}->[$y]}) . "\n";
 	}
-	print $buff;
 }
 
 sub next {
