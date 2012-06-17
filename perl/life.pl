@@ -15,7 +15,7 @@ while (1) {
 	$life->next();
 	$diff = Time::HiRes::time - $start;
 	print ++$n . " : " . $diff . "\n";
-	exit 1 if ($time - $diff < 0);
+	die "Error: input time is too short => '$time'" if ($time - $diff < 0);
 	Time::HiRes::sleep($time - $diff);
 }
 
