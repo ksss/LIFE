@@ -30,19 +30,14 @@ $life->add([
 	[qw/■ ■ ■/],
 ]);
 
-eval {
-	while (1) {
-		print "\33c"; # flash
-		$start = Time::HiRes::time;
-		$life->next();
-		$diff = Time::HiRes::time - $start;
-		print $n++ . " : " . $diff . "\n";
-		die "Error: input time is too short => '$time'" if ($time - $diff < 0);
-		Time::HiRes::sleep($time - $diff);
-	}
-};
-if ($@) {
-	print $@;
+while (1) {
+	print "\33c"; # flash
+	$start = Time::HiRes::time;
+	$life->next();
+	$diff = Time::HiRes::time - $start;
+	print $n++ . " : " . $diff . "\n";
+	die "Error: input time is too short => '$time'" if ($time - $diff < 0);
+	Time::HiRes::sleep($time - $diff);
 }
 
 package GAME::OF::LIFE;
