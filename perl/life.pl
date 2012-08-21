@@ -82,11 +82,11 @@ sub next {
 	$print = defined $print ? $print : 1;
 
 	for my $y (0..$size - 1) {
+		my $ys = $y == 0 ? 0 : ($y - 1);
+		my $ye = $y == ($size - 1) ? ($size - 1) : ($y + 1);
 		for my $x (0..$size - 1) {
 			my $xs = $x == 0 ? 0 : ($x - 1);
 			my $xe = $x == ($size - 1) ? ($size - 1) : ($x + 1);
-			my $ys = $y == 0 ? 0 : ($y - 1);
-			my $ye = $y == ($size - 1) ? ($size - 1) : ($y + 1);
 			my $count = 0;
 			for (my $i = $ys; $i <= $ye; $i++) {
 				for (my $j = $xs; $j <= $xe; $j++) {

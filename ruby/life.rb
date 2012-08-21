@@ -3,9 +3,18 @@
 
 class LIFE
   def initialize (value)
-    @live = value['live']
-    @dead = value['dead']
-    @world = value['world']
+    @world = value['world'] || value
+    @live = value['live'] || '■'
+    @dead = value['dead'] || '□'
+  end
+
+  def drow
+    @world.each do |line|
+      puts line.join ' '
+    end
+  end
+
+  def add
   end
 
   def next
@@ -41,10 +50,15 @@ world = STDIN.read.split(/\n/).map { |i|
   i.gsub(/1/, live).gsub(/0/, dead).split(/\s/)
 }
 
-life = LIFE.new('live' => live, 'dead' => dead, 'world' => world)
-
+life = LIFE.new(
+  'live' => live,
+  'dead' => dead,
+  'world' => world
+)
+system('clear')
+life.drow
+sleep time
 n = 0
-
 loop do
   system('clear')
   t = Time.new
@@ -52,6 +66,6 @@ loop do
   diff = Time.new - t
   n = n.succ
   puts "#{n}:#{diff}"
-  raise "Error: input time is too short => '$time'" if (time - diff < 0)
+  raise "Error: input time is too short => '#{time}'" if (time - diff < 0)
   sleep time - diff
 end
