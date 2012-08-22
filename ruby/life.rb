@@ -19,27 +19,37 @@ class LIFE
 
   def next
     size = @world.size
-    next_world = []
+
+    next_world = Array.new(size) do
+      Array.new(size, 0)
+    end
+
     @world.each_with_index do |line, y|
-      next_world[y] = []
-      line.each_index do |x|
-        ys = y == 0 ? 0 : y - 1
-        ye = y == size - 1 ? size - 1 : y + 1
-        xs = x == 0 ? 0 : x - 1
-        xe = x == size - 1 ? size - 1 : x + 1
-        count = 0
-        (ys..ye).each do |yy|
-          (xs..xe).each do |xx|
-            count += 1 if @world[yy][xx] == @live
+      line.each_with_index do |cell, x|
+        if cell == @live
+          ys = y == 0 ? 0 : y - 1
+          ye = y == size - 1 ? size - 1 : y + 1
+          xs = x == 0 ? 0 : x - 1
+          xe = x == size - 1 ? size - 1 : x + 1
+          (ys..ye).each do |yy|
+            (xs..xe).each do |xx|
+              next_world[yy][xx] += 1
+            end
           end
         end
-        next_world[y][x] = count == 3 ? @live
-          : count == 4 ? @world[y][x]
-          : @dead
       end
-      puts next_world[y].join ' '
     end
-    @world = next_world
+
+    next_world.each_with_index do |line, y|
+      line.each_with_index do |i, x|
+        if i == 3
+          @world[y][x] = @live
+        elsif i != 4
+          @world[y][x] = @dead
+        end
+      end
+      puts @world[y].join ' '
+    end
   end
 end
 

@@ -40,6 +40,7 @@ while (1) {
 	Time::HiRes::sleep($time - $diff);
 }
 
+
 package GAME::OF::LIFE;
 
 use Carp;
@@ -77,29 +78,36 @@ sub next {
 	my $dead  = $self->{dead};
 	my $world = $self->{world};
 	my $size  = $#{$world->[0]} + 1;
-	my $next_world;
-
+	my @next_world = map { [ map { 0 } 1..$size ] } 1..$size;
+	my $next_world = \@next_world;
 	$print = defined $print ? $print : 1;
 
 	for my $y (0..$size - 1) {
-		my $ys = $y == 0 ? 0 : ($y - 1);
-		my $ye = $y == ($size - 1) ? ($size - 1) : ($y + 1);
 		for my $x (0..$size - 1) {
-			my $xs = $x == 0 ? 0 : ($x - 1);
-			my $xe = $x == ($size - 1) ? ($size - 1) : ($x + 1);
-			my $count = 0;
-			for (my $i = $ys; $i <= $ye; $i++) {
-				for (my $j = $xs; $j <= $xe; $j++) {
-					$count++ if $world->[$i]->[$j] eq $live;
+			if ($world->[$y][$x] eq $live) {
+				my $ys = $y == 0 ? 0 : ($y - 1);
+				my $ye = $y == ($size - 1) ? ($size - 1) : ($y + 1);
+				my $xs = $x == 0 ? 0 : ($x - 1);
+				my $xe = $x == ($size - 1) ? ($size - 1) : ($x + 1);
+				for (my $i = $ys; $i <= $ye; $i++) {
+					for (my $j = $xs; $j <= $xe; $j++) {
+						$next_world->[$i]->[$j] += 1;
+					}
 				}
 			}
-			$next_world->[$y][$x] = ($count == 3) ? $live
-				: ($count == 4) ? $world->[$y]->[$x]
-				: $dead;
 		}
-		print join(' ', @{$next_world->[$y]}) . "\n" if $print;
 	}
-	$self->{world} = $next_world;
+
+	for my $y (0..$size - 1) {
+		for my $x (0..$size - 1) {
+			if ($next_world->[$y]->[$x] == 3) {
+				$world->[$y][$x] = $live;
+			} elsif ($next_world->[$y]->[$x] != 4) {
+				$world->[$y]->[$x] = $dead;
+			}
+		}
+		print join(' ', @{$world->[$y]}) . "\n" if $print;
+	}
 };
 
 1;
